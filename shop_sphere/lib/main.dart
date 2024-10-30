@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:shop_sphere/base_module/home/view_model/home_view_model.dart';
 import 'common/theme_manager/theme_manager.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'common/network_connectivity_status.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'base_module/buttom_navigation_screen.dart';
-import 'base_module/home/view_model/home_view_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'base_module/Authentication/View/login_screen.dart';
+import 'base_module/Authentication/ViewModel/AuthViewModel.dart';
 
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://qmztbpmejhngubxxowml.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtenRicG1lamhuZ3VieHhvd21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAyODA0MDUsImV4cCI6MjA0NTg1NjQwNX0.RttRGru4XlycSn5-C1JFBZMp_u4QssG2vQVW9aI0muM'
+  );
 
-void main() async {
-
-  // WidgetsFlutterBinding.ensureInitialized();
-
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -31,6 +28,7 @@ class _MyAppState extends State<MyApp> {
   final MyAppController appController = Get.put(MyAppController());
   final NetworkStatusController _controller = Get.put(NetworkStatusController());
   // final HomeViewModel homeViewModel = Get.put(HomeViewModel());
+  final AuthService _authViewModel = Get.put(AuthService());
 
 
   @override
@@ -51,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       themeMode: appController.themeMode,
       theme: ThemeDataStyle.light,
       darkTheme: ThemeDataStyle.dark,
-      home: BottomNavScreen(),
+      home: LoginScreen(),
     ));
   }
 }

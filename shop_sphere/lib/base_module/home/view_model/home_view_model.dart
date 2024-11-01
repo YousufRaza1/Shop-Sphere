@@ -1,38 +1,33 @@
-import 'package:get/get.dart';
-import '../../../network/api_manager.dart';
-import '../../../network/api_end_point.dart';
 
 import '../model/list_of_product_model.dart';
-import '../../../network/api_end_point.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get/get.dart';
 
-class HomeViewModel extends GetxController {
+
+
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class HomeViewController extends GetxController {
   RxBool isLoading = false.obs;
-  RxList<ListOfProduct> product = RxList<ListOfProduct>([]);
-
-  void getAllProduct() async {
-      this.isLoading.value = true;
-
-      final APIEndpoint endpoint = APIEndpoint(
-          path: 'https://fakestoreapi.com/products',
-        method: HTTPMethod.GET
-      );
-
-      final result = await APIManager.instance.request<List<ListOfProduct>>(
-        endpoint,
-            (data) => listOfProductFromJson(data),
-      );
+  Rx<List<Product>> listOfProduct = Rx<List<Product>>([]);
 
 
-      isLoading.value = false;
+  void fetchProducts() async {
+    final response = await Supabase.instance.client
+        .from('Product')
+        .select();
 
-      if (result.data != null ) {
-        print(result.data!.length);
-      }
-      }
+   print('response json = ${response}');
 
+    if (response == null) {
+      throw Exception('Failed to load products');
+    }
 
+    // Casting response to List to map to Product
+    final data = response as List<dynamic>;
+      listOfProduct.value =  data.map((json) => Product.fromJson(json)).toList();
+    print('data = ${listOfProduct.value}');
   }
 
-
-
+}
 

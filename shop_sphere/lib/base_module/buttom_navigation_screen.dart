@@ -14,7 +14,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
 
   // List of widget pages corresponding to each tab
   final List<Widget> _pages = [
-    HomeView(),
+    HomeScreen(),
     BookmarkScreen(),
     SettingsScreen()
   ];

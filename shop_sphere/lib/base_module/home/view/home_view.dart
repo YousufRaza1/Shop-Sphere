@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final product = products[index];
               return GestureDetector(
                 onTap: () {
-                  Get.to(ProductDetailsScreen(productId: product.id,product: product));
+                  Get.to(ProductDetailsScreen(product: product));
                 },
                 child: Card(
                   shape: RoundedRectangleBorder(

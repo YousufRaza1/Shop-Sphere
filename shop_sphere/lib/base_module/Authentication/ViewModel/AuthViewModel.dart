@@ -9,11 +9,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class AuthService extends GetxController {
   Rx<String> userEmail = "".obs;
   Rx<String> password = "".obs;
+  Rx<String?> authUserEmail = Rx<String?>(null);
+  LogedInUser user = LogedInUser();
 
   Rx<bool> isLoading = false.obs;
   Rx<bool> isValidForPassword = false.obs;
   Rx<bool> isValidForEmail = false.obs;
   Rx<AuthResponse?> authResponse = Rx<AuthResponse?>(null);
+
 
   Future<void> resetPassword(String email, BuildContext context) async {
     // isLoading.value = true;
@@ -27,6 +30,7 @@ class AuthService extends GetxController {
     //   // showToast(context, '${e}');
     // }
   }
+
   //
   // Future<void> signInWithGoogle(BuildContext context) async {
   //   isLoading.value = true;
@@ -125,8 +129,16 @@ class AuthService extends GetxController {
         accessToken: accessToken,
       );
 
+      authResponse.value = response;
+      // authUserEmail.value = response.user?.email;
+
+      final responseUser = await Supabase.instance.client.auth.getUser();
+
+      user.usrEmail = response.user!.email;
       // Check if the user signed in successfully
       if (response.user != null) {
+        print('response.user!.email = ${response.user!.email}');
+        user.usrEmail = response.user!.email;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -221,8 +233,11 @@ class AuthService extends GetxController {
 
       authResponse.value = response;
 
+
       if (response.user != null) {
         print('Success login');
+
+        user.usrEmail = response.user!.email;
 
         Navigator.pushReplacement(
           context,
@@ -269,4 +284,21 @@ class AuthService extends GetxController {
       colorText: Colors.white,
     );
   }
+}
+
+
+class LogedInUser {
+  // Private constructor to prevent external instantiation.
+  LogedInUser._();
+
+  // The single instance of the class.
+  static final LogedInUser _instance = LogedInUser._();
+
+  // Factory constructor to provide access to the singleton instance.
+  factory LogedInUser() {
+    return _instance;
+  }
+  String? usrEmail = null;
+
+
 }

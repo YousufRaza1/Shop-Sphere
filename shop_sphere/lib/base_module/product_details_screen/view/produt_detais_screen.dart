@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../../home/model/list_of_product_model.dart';
 import 'package:get/get.dart';
 import '../view_model/product_datails_view_model.dart';
+import '../../BuyProduct/view/checkout_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Product product;
-
   ProductDetailsScreen({Key? key, required this.product}) : super(key: key);
 
   @override
@@ -283,7 +283,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                       Spacer(),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(CheckoutScreen());
+                        },
                         icon: Icon(Icons.attach_money),
 
                         label: Text("Buy Now",style: TextStyle(color: Colors.black)),

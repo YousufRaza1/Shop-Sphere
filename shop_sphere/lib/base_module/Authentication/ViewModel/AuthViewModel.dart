@@ -134,9 +134,9 @@ class AuthService extends GetxController {
 
       final responseUser = await Supabase.instance.client.auth.getUser();
 
-      user.usrEmail = response.user!.email;
-      // Check if the user signed in successfully
       if (response.user != null) {
+        user.usrEmail = response.user!.email;
+        user.uid = response.user!.id;
         print('response.user!.email = ${response.user!.email}');
         user.usrEmail = response.user!.email;
         Navigator.pushReplacement(
@@ -238,6 +238,7 @@ class AuthService extends GetxController {
         print('Success login');
 
         user.usrEmail = response.user!.email;
+        user.uid = response.user!.id;
 
         Navigator.pushReplacement(
           context,
@@ -299,6 +300,7 @@ class LogedInUser {
     return _instance;
   }
   String? usrEmail = null;
+  String uid = '';
 
 
 }

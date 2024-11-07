@@ -113,20 +113,14 @@ class _AddressInputScreenState extends State<AddressInputScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Save address logic here
-                      // Example: print the input
 
-                       viewModel.address.value?.recipientsName = _nameController.text;
-                      viewModel.address.value?.phoneNumber = _phoneController.text;
-                       viewModel.address.value?.district = _regionController.text;
-                      viewModel.address.value?.address = _addressController.text ;
-                      print("Recipient's Name: ${viewModel.address.value?.recipientsName}");
-                      print("Phone Number: ${viewModel.address.value?.phoneNumber}");
-                      print("Region/City/District: ${viewModel.address.value?.district}");
-                      print("Address: ${viewModel.address.value?.address}");
+                      viewModel.updateAddressOfUser(_nameController.text,_phoneController.text,_regionController.text,_addressController.text);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text("Address saved successfully!")),
                       );
+
+                      Navigator.pop(context);
                     }
                   },
                   child: Text("Save"),

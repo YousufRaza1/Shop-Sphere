@@ -4,6 +4,8 @@ import '../view_model/checkout_view_model.dart';
 import 'user_address_update.dart';
 
 class CheckoutScreen extends StatefulWidget {
+  List<int> listOfProductId;
+  CheckoutScreen({ required this.listOfProductId});
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
@@ -13,8 +15,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    // TODO: implement initState\
+    viewModel.listOfProductId = widget.listOfProductId;
     viewModel.fetchAddressForUsers();
+    viewModel.getProductDetails();
     super.initState();
   }
 
@@ -33,7 +37,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
           // 2. Product List Section with Quantity Management
           Expanded(
-            child: _ProductListSection(),
+            child: _ProductListSection(listOfProductId: widget.listOfProductId),
           ),
 
           Divider(),
@@ -51,21 +55,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
 class _AddressSection extends StatelessWidget {
   final CheckoutController viewModel = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return Obx(() => Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListTile(
-        title: Text(viewModel.address?.value?.recipientsName ?? 'Set name',style: TextStyle(fontWeight: FontWeight.bold)),
+        // Add location icon on the left
+        leading: Icon(Icons.location_on, color: Colors.red, size: 30), // Customize icon color and size
+        title: Text(
+          viewModel.address?.value?.recipientsName ?? 'Set name',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${viewModel.address?.value?.address ?? 'Set you district and thana and local address'}, ${viewModel.address?.value?.district ?? ''}'),
-            Text('${viewModel.address?.value?.phoneNumber ?? 'Set your phone number'}'),
+            Text(
+              '${viewModel.address?.value?.address ?? 'Set your district, thana, and local address'}, ${viewModel.address?.value?.district ?? ''}',
+            ),
+            Text(
+              '${viewModel.address?.value?.phoneNumber ?? 'Set your phone number'}',
+            ),
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.edit),
+          icon: const Icon(Icons.edit),
           onPressed: () {
             // Navigate to Edit Address Screen
             Navigator.push(
@@ -80,6 +94,9 @@ class _AddressSection extends StatelessWidget {
 }
 
 class _ProductListSection extends StatefulWidget {
+  final CheckoutController viewModel = Get.find();
+  List<int> listOfProductId;
+  _ProductListSection({ required this.listOfProductId});
   @override
   _ProductListSectionState createState() => _ProductListSectionState();
 }
@@ -90,69 +107,92 @@ class _ProductListSectionState extends State<_ProductListSection> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 1, // Assume we have 3 products for demonstration
+    return Obx(() => ListView.builder(
+      itemCount: viewModel.fetchedProducts.length,
       itemBuilder: (context, index) {
+        final product = viewModel.fetchedProducts[index];
         return Card(
           margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Product ${index + 1}',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  'Unit Price: \$20.00', // Example unit price
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  'Description: High-quality product', // Example description
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-                SizedBox(height: 8.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (quantity > 1) quantity--;
-                            });
-                          },
-                        ),
-                        Text(quantity.toString()),
-                        IconButton(
-                          icon: Icon(Icons.add),
-                          onPressed: () {
-                            setState(() {
-                              quantity++;
-                            });
-                          },
-                        ),
-                      ],
+                // Product image on the left
+                Container(
+                  width: 80, // Adjust width as needed
+                  height: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    image: DecorationImage(
+                      image: NetworkImage(product.image), // Replace with your image URL
+                      fit: BoxFit.cover,
                     ),
-                    Text(
-                      'Total: \$${(20 * quantity).toStringAsFixed(2)}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                  ),
+                ),
+                SizedBox(width: 16.0), // Space between image and details
+                // Product details on the right
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.title.toString(),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Unit Price: \$${product.price}', // Example unit price
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        product.description, // Example description
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                      SizedBox(height: 8.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.remove),
+                                onPressed: () {
+                                  setState(() {
+                                    if (quantity > 1) quantity--;
+                                  });
+                                },
+                              ),
+                              Text(quantity.toString()),
+                              IconButton(
+                                icon: Icon(Icons.add),
+                                onPressed: () {
+                                  setState(() {
+                                    quantity++;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          Text(
+                            'Total: \$${(product.price * quantity).toStringAsFixed(2)}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         );
       },
-    );
+    ));
   }
 }
+
 
 class _DeliveryOption extends StatelessWidget {
   @override

@@ -284,7 +284,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       Spacer(),
                       ElevatedButton.icon(
                         onPressed: () {
-                          Get.to(CheckoutScreen());
+                          Get.to(CheckoutScreen(listOfProductId: [widget.product.id]));
                         },
                         icon: Icon(Icons.attach_money),
 

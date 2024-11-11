@@ -2,6 +2,7 @@
 import '../model/list_of_product_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
 
 
@@ -27,6 +28,17 @@ class HomeViewController extends GetxController {
     final data = response as List<dynamic>;
       listOfProduct.value =  data.map((json) => Product.fromJson(json)).toList();
     print('data = ${listOfProduct.value}');
+  }
+
+  void showToast(String message) {
+    Get.snackbar(
+      'Error', // Title of the snackbar
+      message, // Message to display
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 3),
+      backgroundColor: Colors.red.withOpacity(0.8),
+      colorText: Colors.white,
+    );
   }
 
 }

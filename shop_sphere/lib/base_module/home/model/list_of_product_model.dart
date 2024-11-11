@@ -3,10 +3,61 @@
 //     final product = productFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:get/get.dart';
 
 List<Product> productFromJson(String str) => List<Product>.from(json.decode(str).map((x) => Product.fromJson(x)));
 
 String productToJson(List<Product> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
+class ProductUIModel extends GetxController {
+
+  RxInt id;
+  Rx<DateTime> createdAt;
+  RxString title;
+  RxString description;
+  RxString category;
+  RxDouble price;
+  RxDouble discountPercentage;
+  RxDouble rating;
+  RxInt stock;
+  RxString warrantyInformation;
+  RxString shippingInformation;
+  RxString availabilityStatus;
+  RxString image;
+  RxInt unit;
+  RxDouble totalPrice;
+
+  // Constructor with required initial values
+  ProductUIModel({
+    required int id,
+    required DateTime createdAt,
+    required String title,
+    required String description,
+    required String category,
+    required double price,
+    required double discountPercentage,
+    required double rating,
+    required int stock,
+    required String warrantyInformation,
+    required String shippingInformation,
+    required String availabilityStatus,
+    required String image
+  })  : id = id.obs,
+        createdAt = createdAt.obs,
+        title = title.obs,
+        description = description.obs,
+        category = category.obs,
+        price = price.obs,
+        discountPercentage = discountPercentage.obs,
+        rating = rating.obs,
+        stock = stock.obs,
+        warrantyInformation = warrantyInformation.obs,
+        shippingInformation = shippingInformation.obs,
+        availabilityStatus = availabilityStatus.obs,
+        image = image.obs,
+        unit = 1.obs,
+        totalPrice = price.obs;
+}
 
 class Product {
   int id;
@@ -22,6 +73,7 @@ class Product {
   String shippingInformation;
   String availabilityStatus;
   String image;
+  int unit;
 
   Product({
     required this.id,
@@ -37,6 +89,7 @@ class Product {
     required this.shippingInformation,
     required this.availabilityStatus,
     required this.image,
+    this.unit = 1
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(

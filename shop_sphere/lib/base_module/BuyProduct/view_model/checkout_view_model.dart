@@ -9,7 +9,29 @@ class CheckoutController extends GetxController {
   final LogedInUser _logedInUser = LogedInUser();
   Rx<Address?> address = Rx<Address?>(null);
   List<int> listOfProductId = [];
-  RxList<Product> fetchedProducts = RxList<Product>([]);
+  RxDouble totalpriceOfAllProduct = 0.0.obs;
+
+  RxList<ProductUIModel> productUI = RxList<ProductUIModel>([]);
+
+
+  @override
+  void onInit() {
+    super.onInit();
+    ever(productUI, (_) => calculateGrandTotal()); // Recalculate when the list updates
+    productUI.forEach((product) {
+      ever(product.totalPrice, (_) => calculateGrandTotal()); // Recalculate on each product's price change
+    });
+  }
+
+  void calculateGrandTotal() {
+    double total = 0.0;
+    for (var product in productUI) {
+      total += product.totalPrice.value;
+    }
+    totalpriceOfAllProduct.value = total + 5.0;
+    print(totalpriceOfAllProduct.value.toString());
+
+  }
 
   getProductDetails() async {
     for (int i = 0; i < listOfProductId.length; i++) {
@@ -17,17 +39,31 @@ class CheckoutController extends GetxController {
           .from('Product')
           .select()
           .eq('id', listOfProductId[i])
-          .single(); // Fetch a single row for the specific id
+          .single();
 
       if (response != null) {
         // Parse the response to a Product object and add it to fetchedProducts list
-        fetchedProducts.value.add(Product.fromJson(response));
-        fetchedProducts.refresh();
+        final product = Product.fromJson(response);
+        productUI.value.add(ProductUIModel(
+          id: product.id,
+          createdAt: product.createdAt,
+          title: product.title,
+          description: product.description,
+          category: product.category,
+          price: product.price,
+          discountPercentage: product.discountPercentage,
+          rating: product.rating,
+          stock: product.stock,
+          warrantyInformation: product.warrantyInformation,
+          shippingInformation: product.shippingInformation,
+          availabilityStatus: product.availabilityStatus,
+          image: product.image
+        ));
+        productUI.refresh();
       } else {
         print('Failed to load product with ID: ${listOfProductId[i]}');
       }
     }
-    print(fetchedProducts.length);
   }
 
 

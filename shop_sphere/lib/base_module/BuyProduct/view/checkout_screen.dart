@@ -108,9 +108,9 @@ class _ProductListSectionState extends State<_ProductListSection> {
   @override
   Widget build(BuildContext context) {
     return Obx(() => ListView.builder(
-      itemCount: viewModel.fetchedProducts.length,
+      itemCount: viewModel.productUI.length,
       itemBuilder: (context, index) {
-        final product = viewModel.fetchedProducts[index];
+        final product = viewModel.productUI[index];
         return Card(
           margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           child: Padding(
@@ -125,7 +125,7 @@ class _ProductListSectionState extends State<_ProductListSection> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8.0),
                     image: DecorationImage(
-                      image: NetworkImage(product.image), // Replace with your image URL
+                      image: NetworkImage(product.image.value), // Replace with your image URL
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -147,7 +147,7 @@ class _ProductListSectionState extends State<_ProductListSection> {
                       ),
                       SizedBox(height: 8.0),
                       Text(
-                        product.description, // Example description
+                        product.description.value, // Example description
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                       SizedBox(height: 8.0),
@@ -160,23 +160,30 @@ class _ProductListSectionState extends State<_ProductListSection> {
                                 icon: Icon(Icons.remove),
                                 onPressed: () {
                                   setState(() {
-                                    if (quantity > 1) quantity--;
+                                    if (product.unit.value > 1) {
+                                      product.unit.value--;
+                                      product.totalPrice.value = product.unit.value * product.price.value;
+                                      viewModel.calculateGrandTotal();
+                                    }
+
                                   });
                                 },
                               ),
-                              Text(quantity.toString()),
+                              Text(product.unit.value.toString()),
                               IconButton(
                                 icon: Icon(Icons.add),
                                 onPressed: () {
                                   setState(() {
-                                    quantity++;
+                                    product.unit.value++;
+                                    product.totalPrice.value = product.unit.value * product.price.value;
+                                    viewModel.calculateGrandTotal();
                                   });
                                 },
                               ),
                             ],
                           ),
                           Text(
-                            'Total: \$${(product.price * quantity).toStringAsFixed(2)}',
+                            'Total: \$${(product.totalPrice.value).toStringAsFixed(2)}',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -206,6 +213,7 @@ class _DeliveryOption extends StatelessWidget {
 }
 
 class _BottomSummarySection extends StatelessWidget {
+  final CheckoutController viewModel = Get.find();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -221,10 +229,10 @@ class _BottomSummarySection extends StatelessWidget {
                 'Grand Total',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              Text(
-                '\$65.00', // Example total
+              Obx(() => Text(
+                '\$${viewModel.totalpriceOfAllProduct.value.toStringAsFixed(2)}', // Displays reactive grand total
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              )),
             ],
           ),
           SizedBox(height: 16.0),

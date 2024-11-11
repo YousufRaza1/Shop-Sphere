@@ -1,16 +1,45 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../model/product_review_model.dart';
 import 'package:get/get.dart';
 import '../../Authentication/ViewModel/AuthViewModel.dart';
 import '../../Authentication/ViewModel/AuthViewModel.dart';
+import 'package:flutter/material.dart';
 
 class ProductDetailsViewModel extends GetxController {
   final SupabaseClient _client = Supabase.instance.client;
   RxList<ProductReview> listOfReviews = RxList<ProductReview>([]);
   final AuthService authService = Get.find<AuthService>();
   RxBool isLoading = false.obs;
+  final LogedInUser _logedInUser = LogedInUser();
   LogedInUser user = LogedInUser();
+
+  void addToCartClicked(int productId) async {
+    final responseValueForExistCheck = await _client
+        .from('Cart')
+        .select()
+        .eq('product_id', productId)
+        .eq('user_uid', _logedInUser.uid);
+
+    if (responseValueForExistCheck != null) {
+      final listOfproductForUserAndProduct =
+          cartFromJson(jsonEncode(responseValueForExistCheck));
+
+      print('responseValueForExistCheck= ${responseValueForExistCheck}');
+      if (listOfproductForUserAndProduct.length >= 1) {
+        showToast('You have already added this product to cart');
+      } else {
+        final response = await _client.from('Cart').insert(
+            {'product_id': productId, 'user_uid': _logedInUser.uid}).select();
+
+        if (response.isNotEmpty) {
+          showToast('Product added to cart');
+        }
+      }
+    }
+  }
 
   void fetchReviews(int productId) async {
     isLoading.value = true;
@@ -21,8 +50,9 @@ class ProductDetailsViewModel extends GetxController {
 
     // Checking if data exists and casting it to the expected type
     final data = response as List<dynamic>;
-    listOfReviews.value =  data.map((json) =>
-        ProductReview.fromJson(json as Map<String, dynamic>)).toList();
+    listOfReviews.value = data
+        .map((json) => ProductReview.fromJson(json as Map<String, dynamic>))
+        .toList();
     print(listOfReviews);
     isLoading.value = false;
   }
@@ -32,8 +62,7 @@ class ProductDetailsViewModel extends GetxController {
     required int rating,
     required String review,
   }) async {
-
-    final userEmail =  user.usrEmail;
+    final userEmail = user.usrEmail;
 
     final response = await _client.from('Product_Review').insert({
       'product_id': productId,
@@ -42,7 +71,13 @@ class ProductDetailsViewModel extends GetxController {
       'user_email': userEmail,
     });
 
-    listOfReviews.add(ProductReview(id: 1, createdAt: DateTime.now(), productId: productId, userEmail: userEmail!, rating: rating, review: review));
+    listOfReviews.add(ProductReview(
+        id: 1,
+        createdAt: DateTime.now(),
+        productId: productId,
+        userEmail: userEmail!,
+        rating: rating,
+        review: review));
     // fetchReviews(productId);
 
     if (response.error != null) {
@@ -50,5 +85,16 @@ class ProductDetailsViewModel extends GetxController {
     } else {
       print('Review added successfully');
     }
+  }
+
+  void showToast(String message) {
+    Get.snackbar(
+      'Success', // Title of the snackbar
+      message, // Message to display
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 3),
+      backgroundColor: Colors.green.withOpacity(0.8),
+      colorText: Colors.white,
+    );
   }
 }

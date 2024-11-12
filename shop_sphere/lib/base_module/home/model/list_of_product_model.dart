@@ -59,7 +59,7 @@ class ProductUIModel extends GetxController {
         totalPrice = price.obs;
 }
 
-class Product {
+class Product extends GetxController{
   int id;
   DateTime createdAt;
   String title;
@@ -74,6 +74,8 @@ class Product {
   String availabilityStatus;
   String image;
   int unit;
+  RxBool isSelected =  RxBool(true);
+
 
   Product({
     required this.id,

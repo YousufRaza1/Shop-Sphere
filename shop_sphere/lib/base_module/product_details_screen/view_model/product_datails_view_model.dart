@@ -8,6 +8,7 @@ import '../../Authentication/ViewModel/AuthViewModel.dart';
 import '../../Authentication/ViewModel/AuthViewModel.dart';
 import 'package:flutter/material.dart';
 
+
 class ProductDetailsViewModel extends GetxController {
   final SupabaseClient _client = Supabase.instance.client;
   RxList<ProductReview> listOfReviews = RxList<ProductReview>([]);

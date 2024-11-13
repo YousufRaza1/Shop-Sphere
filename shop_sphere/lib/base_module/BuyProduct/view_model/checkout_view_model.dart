@@ -29,9 +29,38 @@ class CheckoutController extends GetxController {
       total += product.totalPrice.value;
     }
     totalpriceOfAllProduct.value = total + 5.0;
-    print(totalpriceOfAllProduct.value.toString());
 
   }
+
+  void placeOrderClicked() async {
+    print('placeOrderClicked');
+
+    for (var product in productUI) {
+      print('product.id = ${product.id}.');
+
+       removeSingleItem(product.id.value);
+
+
+    }
+
+
+  }
+
+  void removeSingleItem(int productID) async {
+    final response = await _client
+        .from('Cart')
+        .delete()
+        .eq('product_id', productID)
+        .eq('user_uid', _logedInUser.uid);
+
+    // Check if the response contains an error
+    if (response.error == null) {
+      print('Product removed successfully');
+    } else {
+      print('Error removing product: ${response.error!.message}');
+    }
+  }
+
 
   getProductDetails() async {
     for (int i = 0; i < listOfProductId.length; i++) {

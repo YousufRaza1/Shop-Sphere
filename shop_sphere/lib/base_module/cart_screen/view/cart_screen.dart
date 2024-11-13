@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shop_sphere/base_module/BuyProduct/view/checkout_screen.dart';
 import '../view_model/CartViewModel.dart';
 import '../../home/model/list_of_product_model.dart';
 import '../../product_details_screen/view/produt_detais_screen.dart';
@@ -16,6 +17,7 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     cartController.getAllCartProduct();
+    cartController.selectedProductId();
   }
 
   @override
@@ -25,13 +27,15 @@ class _CartScreenState extends State<CartScreen> {
         title: Text('Cart'),
       ),
       body: Obx(
-            () => ListView.builder(
+        () => ListView.builder(
           itemCount: cartController.listOfProduct.length,
           itemBuilder: (context, index) {
             final cartItem = cartController.listOfProduct[index];
             return Dismissible(
-              key: Key(cartItem.id.toString()), // Use unique keys
-              direction: DismissDirection.endToStart, // Swipe from right to left
+              key: Key(cartItem.id.toString()),
+              // Use unique keys
+              direction: DismissDirection.endToStart,
+              // Swipe from right to left
               background: Container(
                 color: Colors.red,
                 alignment: Alignment.centerRight,
@@ -39,10 +43,7 @@ class _CartScreenState extends State<CartScreen> {
                 child: Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (direction) {
-                // cartController.removeProduct(cartItem); // Remove item from controller
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${cartItem.title} removed from cart')),
-                );
+                cartController.removeProduct(cartItem.id);
               },
               child: CartItemCard(cartItem: cartItem),
             );
@@ -51,19 +52,25 @@ class _CartScreenState extends State<CartScreen> {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total: \$${100}', // Display total price dynamically
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          padding: const EdgeInsets.all(0),
+          child: SizedBox(
+            width: double.infinity, // Full width
+            height: 100,            // Desired height
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigoAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              ElevatedButton(
-                onPressed: 10 > 0 ? cartController.checkout : null,
-                child: Text('Checkout'),
-              ),
-            ],
+              onPressed: () {
+                Get.to(CheckoutScreen(
+                  listOfProductId: cartController.listOfselectedProductId,
+                ));
+                cartController.checkout();
+              },
+              child: Text('Checkout'),
+            ),
           ),
         ),
       ),
@@ -86,12 +93,12 @@ class CartItemCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Obx(() => Checkbox(
-              value: cartItem.isSelected.value,
-              onChanged: (value) {
-                cartItem.isSelected.value = value!;
-                // Get.find<CartController>().calculateTotal();
-              },
-            )),
+                  value: cartItem.isSelected.value,
+                  onChanged: (value) {
+                    cartItem.isSelected.value = value!;
+                    Get.find<CartController>().selectedProductId();
+                  },
+                )),
             Image.network(
               cartItem.image,
               width: 60,
@@ -111,7 +118,8 @@ class CartItemCard extends StatelessWidget {
                       cartItem.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 4.0),
                     Text(
@@ -123,7 +131,8 @@ class CartItemCard extends StatelessWidget {
                     SizedBox(height: 8.0),
                     Text(
                       '\$${cartItem.price.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),

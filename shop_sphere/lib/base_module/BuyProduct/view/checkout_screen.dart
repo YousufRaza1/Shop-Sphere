@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../view_model/checkout_view_model.dart';
 import 'user_address_update.dart';
+import 'package:lottie/lottie.dart';
+
 
 class CheckoutScreen extends StatefulWidget {
   List<int> listOfProductId;
@@ -236,26 +238,19 @@ class _BottomSummarySection extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.0),
-          ElevatedButton(
-            onPressed: () {
-              // Place Order Action
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Order Placed'),
-                  content: Text('Thank you for your purchase!'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('OK'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            child: Text('Place Order'),
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+          Container(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {
+                viewModel.placeOrderClicked();
+                Get.to(SuccessScreen());
+              },
+              child: Text('Place Order'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                backgroundColor: Colors.blue
+              ),
             ),
           ),
         ],
@@ -271,5 +266,19 @@ class EditAddressScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Edit Address')),
       body: Center(child: Text('Edit Address Screen')),
     );
+  }
+}
+
+class SuccessScreen extends StatefulWidget {
+  const SuccessScreen({super.key});
+
+  @override
+  State<SuccessScreen> createState() => _SuccessScreenState();
+}
+
+class _SuccessScreenState extends State<SuccessScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Lottie.asset('assets/success.json');
   }
 }

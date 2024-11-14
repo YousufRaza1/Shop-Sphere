@@ -14,6 +14,7 @@ class HomeViewController extends GetxController {
 
 
   void fetchProducts() async {
+    isLoading.value = true;
     final response = await Supabase.instance.client
         .from('Product')
         .select();
@@ -28,6 +29,7 @@ class HomeViewController extends GetxController {
     final data = response as List<dynamic>;
       listOfProduct.value =  data.map((json) => Product.fromJson(json)).toList();
     print('data = ${listOfProduct.value}');
+    isLoading.value = false;
   }
 
   void showToast(String message) {

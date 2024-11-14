@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import '../view_model/home_view_model.dart';
 import '../model/list_of_product_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -26,12 +27,12 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Obx(() {
         final products = viewController.listOfProduct.value;
         if (products.isEmpty) {
-          return Center(child: Text('No Products found'));
+          return Center(child: Lottie.asset('assets/loading.json'));
         }
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
+        return viewController.isLoading.value ? Lottie.asset('assets/loading.json') : Padding(
+          padding: EdgeInsets.all(8.0),
           child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, // Number of columns
               childAspectRatio: 0.67, // Adjusted aspect ratio for better layout
               crossAxisSpacing: 10.0, // Space between columns
@@ -54,7 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       // Product Image
                       ClipRRect(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(12)),
                         child: Image.network(
                           product.image ?? '',
                           fit: BoxFit.fitHeight,
@@ -67,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
                           product.title ?? 'No Title',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -84,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Text(
                               '\$${product.price?.toStringAsFixed(2) ?? 'N/A'}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.green,
                                 fontWeight: FontWeight.w600,
@@ -93,11 +95,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             Spacer(),
                             Row(
                               children: [
-                                Icon(Icons.star, color: Colors.orange, size: 16),
+                                const Icon(Icons.star,
+                                    color: Colors.orange, size: 16),
                                 SizedBox(width: 4),
                                 Text(
                                   product.rating?.toString() ?? 'N/A',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black54,
@@ -121,7 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       // Product Category
-
                     ],
                   ),
                 ),
@@ -129,8 +131,6 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         );
-
-
       }),
     );
   }

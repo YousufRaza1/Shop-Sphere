@@ -4,6 +4,7 @@ import 'package:shop_sphere/base_module/BuyProduct/view/checkout_screen.dart';
 import '../view_model/CartViewModel.dart';
 import '../../home/model/list_of_product_model.dart';
 import '../../product_details_screen/view/produt_detais_screen.dart';
+import 'package:lottie/lottie.dart';
 
 class CartScreen extends StatefulWidget {
   @override
@@ -27,35 +28,39 @@ class _CartScreenState extends State<CartScreen> {
         title: Text('Cart'),
       ),
       body: Obx(
-        () => ListView.builder(
-          itemCount: cartController.listOfProduct.length,
-          itemBuilder: (context, index) {
-            final cartItem = cartController.listOfProduct[index];
-            return Dismissible(
-              key: Key(cartItem.id.toString()),
-              // Use unique keys
-              direction: DismissDirection.endToStart,
-              // Swipe from right to left
-              background: Container(
-                color: Colors.red,
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.only(right: 20.0),
-                child: Icon(Icons.delete, color: Colors.white),
-              ),
-              onDismissed: (direction) {
-                cartController.removeProduct(cartItem.id);
-              },
-              child: CartItemCard(cartItem: cartItem),
-            );
-          },
-        ),
+        () => cartController.isLoading.value
+            ? Center(child: Lottie.asset('assets/loading.json'))
+            : cartController.listOfProduct.isEmpty
+                ? EmptyCartView()
+                : ListView.builder(
+                    itemCount: cartController.listOfProduct.length,
+                    itemBuilder: (context, index) {
+                      final cartItem = cartController.listOfProduct[index];
+                      return Dismissible(
+                        key: Key(cartItem.id.toString()),
+                        // Use unique keys
+                        direction: DismissDirection.endToStart,
+                        // Swipe from right to left
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.only(right: 20.0),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (direction) {
+                          cartController.removeProduct(cartItem.id);
+                        },
+                        child: CartItemCard(cartItem: cartItem),
+                      );
+                    },
+                  ),
       ),
       bottomNavigationBar: BottomAppBar(
         child: Padding(
           padding: const EdgeInsets.all(0),
           child: SizedBox(
             width: double.infinity, // Full width
-            height: 100,            // Desired height
+            height: 100, // Desired height
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.indigoAccent,
@@ -140,6 +145,44 @@ class CartItemCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// Custom Empty Cart View
+class EmptyCartView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Display Lottie animation or a static illustration
+          Lottie.asset(
+            'assets/empty_cart.json',
+            width: 200,
+            height: 200,
+            repeat: false,
+          ),
+          SizedBox(height: 24.0),
+          Text(
+            'Your cart is empty!',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[700],
+            ),
+          ),
+          SizedBox(height: 8.0),
+          Text(
+            'Looks like you haven\'t added anything yet.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
       ),
     );
   }

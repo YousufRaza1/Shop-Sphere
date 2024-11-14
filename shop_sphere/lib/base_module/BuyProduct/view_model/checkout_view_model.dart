@@ -3,6 +3,7 @@ import 'package:shop_sphere/base_module/BuyProduct/model/user_address_model.dart
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../Authentication/ViewModel/AuthViewModel.dart';
 import '../../home/model/list_of_product_model.dart';
+import 'package:intl/intl.dart';
 
 class CheckoutController extends GetxController {
   final SupabaseClient _client = Supabase.instance.client;
@@ -13,13 +14,16 @@ class CheckoutController extends GetxController {
 
   RxList<ProductUIModel> productUI = RxList<ProductUIModel>([]);
 
-
   @override
   void onInit() {
     super.onInit();
-    ever(productUI, (_) => calculateGrandTotal()); // Recalculate when the list updates
+    ever(productUI,
+        (_) => calculateGrandTotal()); // Recalculate when the list updates
     productUI.forEach((product) {
-      ever(product.totalPrice, (_) => calculateGrandTotal()); // Recalculate on each product's price change
+      ever(
+          product.totalPrice,
+          (_) =>
+              calculateGrandTotal()); // Recalculate on each product's price change
     });
   }
 
@@ -29,7 +33,6 @@ class CheckoutController extends GetxController {
       total += product.totalPrice.value;
     }
     totalpriceOfAllProduct.value = total + 5.0;
-
   }
 
   void placeOrderClicked() async {
@@ -38,12 +41,9 @@ class CheckoutController extends GetxController {
     for (var product in productUI) {
       print('product.id = ${product.id}.');
 
-       removeSingleItem(product.id.value);
-
-
+      removeSingleItem(product.id.value);
+      addToOrderList(product.id.value,product.unit.value);
     }
-
-
   }
 
   void removeSingleItem(int productID) async {
@@ -61,6 +61,20 @@ class CheckoutController extends GetxController {
     }
   }
 
+  void addToOrderList(int productID,int unit) async {
+    DateTime now = DateTime.now();
+    DateTime futureDate = now.add(Duration(days: 5));
+
+    // Format as ISO 8601 string
+    String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ssZ").format(futureDate);
+    final response = await _client.from('Order').insert({
+      'product_id': productID,
+      'user_uid': _logedInUser.uid,
+      'shipping_status': 'Ordered', //Packed, In Transit, Delivered
+      'unit': unit,
+      'estimated_delivery_date': formattedDate
+    });
+  }
 
   getProductDetails() async {
     for (int i = 0; i < listOfProductId.length; i++) {
@@ -74,20 +88,19 @@ class CheckoutController extends GetxController {
         // Parse the response to a Product object and add it to fetchedProducts list
         final product = Product.fromJson(response);
         productUI.value.add(ProductUIModel(
-          id: product.id,
-          createdAt: product.createdAt,
-          title: product.title,
-          description: product.description,
-          category: product.category,
-          price: product.price,
-          discountPercentage: product.discountPercentage,
-          rating: product.rating,
-          stock: product.stock,
-          warrantyInformation: product.warrantyInformation,
-          shippingInformation: product.shippingInformation,
-          availabilityStatus: product.availabilityStatus,
-          image: product.image
-        ));
+            id: product.id,
+            createdAt: product.createdAt,
+            title: product.title,
+            description: product.description,
+            category: product.category,
+            price: product.price,
+            discountPercentage: product.discountPercentage,
+            rating: product.rating,
+            stock: product.stock,
+            warrantyInformation: product.warrantyInformation,
+            shippingInformation: product.shippingInformation,
+            availabilityStatus: product.availabilityStatus,
+            image: product.image));
         productUI.refresh();
       } else {
         print('Failed to load product with ID: ${listOfProductId[i]}');
@@ -95,13 +108,8 @@ class CheckoutController extends GetxController {
     }
   }
 
-
-  updateAddressOfUser(
-      String recipientsName,
-      String phoneNumber,
-      String district,
-      String address
-      ) async {
+  updateAddressOfUser(String recipientsName, String phoneNumber,
+      String district, String address) async {
     final userUid = _logedInUser.uid;
     final response =
         await _client.from('Customer_Address').select().eq('user_uid', userUid);

@@ -9,7 +9,8 @@ class CartController extends GetxController {
   final SupabaseClient _client = Supabase.instance.client;
   final LogedInUser _logedInUser = LogedInUser();
   RxList<Product> listOfProduct = RxList<Product>([]);
-  List<int> listOfselectedProductId = [];
+  RxList<int> listOfselectedProductId = RxList<int>([]);
+  RxBool isLoading = false.obs;
 
   void checkout() {
     // Perform checkout action
@@ -32,17 +33,21 @@ class CartController extends GetxController {
   }
 
   selectedProductId() {
-    listOfselectedProductId = [];
+    listOfselectedProductId = RxList<int>([]);
     for (int index = 0; index < listOfProduct.length; index++) {
       if (listOfProduct[index].isSelected == true) {
         listOfselectedProductId.add(listOfProduct[index].id);
+        listOfselectedProductId.refresh();
       }
     }
+    listOfselectedProductId.refresh();
     print(
         'called and selected product length - ${listOfselectedProductId.length}');
+    listOfselectedProductId.refresh();
   }
 
   getAllCartProduct() async {
+    isLoading.value = true;
     listOfProduct = RxList<Product>([]);
     final responseValueForExistCheck =
         await _client.from('Cart').select().eq('user_uid', _logedInUser.uid);
@@ -73,6 +78,7 @@ class CartController extends GetxController {
     } else {
       print('no item is found');
     }
+    isLoading.value = false;
     selectedProductId();
   }
 }

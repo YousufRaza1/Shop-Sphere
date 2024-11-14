@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'Settings/View/setting_screen.dart';
 import 'package:shop_sphere/base_module/home/view/home_view.dart';
 import 'cart_screen/view/cart_screen.dart';
+import 'order/view/order_screen.dart';
 
 class BottomNavScreen extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   final List<Widget> _pages = [
     HomeScreen(),
     CartScreen(),
+    OrderScreen(),
     SettingsScreen()
   ];
 

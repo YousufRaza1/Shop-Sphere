@@ -30,13 +30,13 @@ class ProductDetailsViewModel extends GetxController {
 
       print('responseValueForExistCheck= ${responseValueForExistCheck}');
       if (listOfproductForUserAndProduct.length >= 1) {
-        showToast('You have already added this product to cart');
+        Get.snackbar('Cart', 'Already product added to card');
       } else {
         final response = await _client.from('Cart').insert(
             {'product_id': productId, 'user_uid': _logedInUser.uid}).select();
 
         if (response.isNotEmpty) {
-          showToast('Product added to cart');
+          Get.snackbar('Cart', 'Product added to cart');
         }
       }
     }
@@ -49,7 +49,6 @@ class ProductDetailsViewModel extends GetxController {
         .select()
         .eq('product_id', productId);
 
-    // Checking if data exists and casting it to the expected type
     final data = response as List<dynamic>;
     listOfReviews.value = data
         .map((json) => ProductReview.fromJson(json as Map<String, dynamic>))
@@ -93,7 +92,7 @@ class ProductDetailsViewModel extends GetxController {
       'Success', // Title of the snackbar
       message, // Message to display
       snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
       backgroundColor: Colors.green.withOpacity(0.8),
       colorText: Colors.white,
     );

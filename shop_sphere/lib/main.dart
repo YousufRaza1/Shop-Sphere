@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
 
 class MyAppController extends GetxController {
   // Initially set the locale to Bangla and theme mode to System
-  var _locale = Locale('bn').obs;
+  var _locale = Locale('en').obs;
   var _themeMode = ThemeMode.system.obs;
 
   // Getters for locale and theme

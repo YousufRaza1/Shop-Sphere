@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'language_setting_screen.dart';
 import 'theme_screen.dart';
+import '../../Authentication/View/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -14,7 +15,7 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.all(16.0),
         children: [
-          _buildMenuItem(context, AppLocalizations.of(context)!.languages, LanguagesScreen()),
+          // _buildMenuItem(context, AppLocalizations.of(context)!.languages, LanguagesScreen()),
           _buildMenuItem(context, AppLocalizations.of(context)!.themes, ThemeScreen()),
           _logoutMenuItme(context)
 
@@ -44,7 +45,7 @@ class SettingsScreen extends StatelessWidget {
         ,
         trailing: Icon(Icons.arrow_forward),
         onTap: () {
-          Get.offAll(() => Text('hello'));
+          Get.offAll(() => LoginScreen());
         },
       ),
     );

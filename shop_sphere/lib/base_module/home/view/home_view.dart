@@ -71,8 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           product.title ?? 'No Title',
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            fontWeight: FontWeight.bold
+
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

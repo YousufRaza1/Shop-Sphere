@@ -25,7 +25,7 @@ class _OrderScreenState extends State<OrderScreen> {
       appBar: AppBar(
         title: Text('Orders'),
       ),
-      body: orderViewModel.isLoading.value == true ? Center(child: Lottie.asset('assets/loading.json')): SingleChildScrollView(
+      body: false == true ? Center(child: Lottie.asset('assets/loading.json')): SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

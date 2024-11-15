@@ -14,109 +14,75 @@ class OrderViewModel extends GetxController {
   RxList<OrderedProduct> listOfPastOrders = RxList<OrderedProduct>([]);
   RxList<OrderedProduct> listOfCurrentOrders = RxList<OrderedProduct>([]);
 
-
-
   void fetchOrders() async {
-   // this.isLoading.value = true;
-    listOfPastOrders = RxList<OrderedProduct>([]);
-     listOfCurrentOrders = RxList<OrderedProduct>([]);
-    listOfOrders.value = RxList<Order>([]);
-    // Perform the query and wait for the response
-    final response = await _client
-        .from('Order')
-        .select()
-        .eq('user_uid', _logedInUser.uid);
+    isLoading.value = true;
 
-    // Check for errors
-    if (response == null) {
-      print('Error fetching orders: ');
-      this.isLoading.value = false;
-      return;
-    }
+    listOfPastOrders.clear();
+    listOfCurrentOrders.clear();
+    listOfOrders.clear();
 
-    // Decode the data into a list of Order objects if no errors
-    final List<dynamic> data = response;
-    listOfOrders.value = data.map((json) => Order.fromJson(json))
-        .toList();
-    listOfOrders.refresh();
-
-    // Print each order's details
-    for (var order in listOfOrders.value) {
-
-      print('Product ID: ${order.productId}');
-
+    try {
       final response = await _client
-          .from('Product')
+          .from('Order')
           .select()
-          .eq('id', order.productId)
-          .single();
+          .eq('user_uid', _logedInUser.uid);
 
-      if (response != null) {
-        // Parse the response to a Product object and add it to fetchedProducts list
-        final product = Product.fromJson(response);
-        if(order.shippingStatus == 'Delivered') {
-          this.listOfPastOrders.value.add(OrderedProduct(
-              id: product.id,
-              createdAt: product.createdAt,
-              title: product.title,
-              description: product.description,
-              category: product.category,
-              price: product.price,
-              discountPercentage: product.discountPercentage,
-              rating: product.rating,
-              stock: product.stock,
-              warrantyInformation: product.warrantyInformation,
-              shippingInformation: product.shippingInformation,
-              availabilityStatus: product.availabilityStatus,
-              image: product.image,
-              unit: order.unit,
-              shippingStatus: order.shippingStatus,
-              trackingNumber: order.trackingNumber,
-              estimatedDeliveryDate: order.estimatedDeliveryDate
-          ));
-          listOfPastOrders.refresh();
-        } else {
-          this.listOfCurrentOrders.value.add(OrderedProduct(
-              id: product.id,
-              createdAt: product.createdAt,
-              title: product.title,
-              description: product.description,
-              category: product.category,
-              price: product.price,
-              discountPercentage: product.discountPercentage,
-              rating: product.rating,
-              stock: product.stock,
-              warrantyInformation: product.warrantyInformation,
-              shippingInformation: product.shippingInformation,
-              availabilityStatus: product.availabilityStatus,
-              image: product.image,
-              unit: order.unit,
-              shippingStatus: order.shippingStatus,
-              trackingNumber: order.trackingNumber,
-              estimatedDeliveryDate: order.estimatedDeliveryDate
-          ));
-          listOfCurrentOrders.refresh();
-        }
-
-
-      } else {
+      if (response == null) {
+        print('Error fetching orders: ');
         isLoading.value = false;
-        isLoading.refresh();
-
+        return;
       }
 
+      final List<dynamic> data = response ?? [];
+      listOfOrders.value = data.map((json) => Order.fromJson(json)).toList();
 
+      for (var order in listOfOrders) {
+        final productResponse = await _client
+            .from('Product')
+            .select()
+            .eq('id', order.productId)
+            .single();
 
+        if (productResponse == null) {
+          print('Error fetching product details:');
+          continue;
+        }
+
+        final product = Product.fromJson(productResponse);
+        final orderedProduct = OrderedProduct(
+          id: product.id,
+          createdAt: product.createdAt,
+          title: product.title,
+          description: product.description,
+          category: product.category,
+          price: product.price,
+          discountPercentage: product.discountPercentage,
+          rating: product.rating,
+          stock: product.stock,
+          warrantyInformation: product.warrantyInformation,
+          shippingInformation: product.shippingInformation,
+          availabilityStatus: product.availabilityStatus,
+          image: product.image,
+          unit: order.unit,
+          shippingStatus: order.shippingStatus,
+          trackingNumber: order.trackingNumber,
+          estimatedDeliveryDate: order.estimatedDeliveryDate,
+        );
+
+        if (order.shippingStatus == 'Delivered') {
+          listOfPastOrders.add(orderedProduct);
+        } else {
+          listOfCurrentOrders.add(orderedProduct);
+        }
+      }
+    } catch (e) {
+      print("An error occurred: $e");
+    } finally {
+      isLoading.value = false;
     }
-    isLoading.value = false;
-    isLoading.refresh();
-
   }
-
-
-
-
 }
+
 
 
 

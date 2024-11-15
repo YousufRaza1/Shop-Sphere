@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../view_model/checkout_view_model.dart';
 import 'user_address_update.dart';
 import 'package:lottie/lottie.dart';
+import '../../buttom_navigation_screen.dart';
 
 
 class CheckoutScreen extends StatefulWidget {
@@ -269,6 +270,7 @@ class EditAddressScreen extends StatelessWidget {
   }
 }
 
+
 class SuccessScreen extends StatefulWidget {
   const SuccessScreen({super.key});
 
@@ -279,6 +281,20 @@ class SuccessScreen extends StatefulWidget {
 class _SuccessScreenState extends State<SuccessScreen> {
   @override
   Widget build(BuildContext context) {
-    return Lottie.asset('assets/success.json');
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Navigate to home screen
+            Get.offAll(() => BottomNavScreen());
+          },
+        ),
+        title: Text("Success"),
+      ),
+      body: Center(
+        child: Lottie.asset('assets/success.json'),
+      ),
+    );
   }
 }

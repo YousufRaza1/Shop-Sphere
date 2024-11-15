@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../Authentication/ViewModel/AuthViewModel.dart';
 import '../../home/model/list_of_product_model.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
+
 
 class CheckoutController extends GetxController {
   final SupabaseClient _client = Supabase.instance.client;
@@ -70,7 +72,7 @@ class CheckoutController extends GetxController {
     final response = await _client.from('Order').insert({
       'product_id': productID,
       'user_uid': _logedInUser.uid,
-      'shipping_status': 'Ordered', //Packed, In Transit, Delivered
+      'shipping_status': getRandomStatus(), //Packed, In Transit, Delivered
       'unit': unit,
       'estimated_delivery_date': formattedDate
     });
@@ -162,5 +164,17 @@ class CheckoutController extends GetxController {
     } else {
       print('didnt find any data');
     }
+  }
+
+  String getRandomStatus() {
+    List<String> statuses = ["Packed", "In Transit", "Delivered", "Ordered"];
+
+    // Generate a random index
+    Random random = Random();
+    int randomIndex = random.nextInt(statuses.length);
+
+    // Get a random status
+    String randomStatus = statuses[randomIndex];
+    return randomStatus;
   }
 }

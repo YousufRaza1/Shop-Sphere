@@ -11,6 +11,7 @@ Shop Sphere is a dynamic and feature-rich e-commerce application designed to off
 - **Shopping Cart:** Add products to the cart and manage quantities. View a detailed summary of the cart.
 - **Order Management:** Place orders with a seamless checkout experience.Track current and past orders.
 - **Profile Management:** Edit personal details, view order history.
+- **Lottie Animation:** Integrate some nice animation using lottie.
 - **Theme Support:** Toggle between light mode, dark mode, or system mode for an enhanced visual experience.
 - **Error handling:** Comprehensive error handling ensures smooth app navigation and feedback in case of issues.
 
